@@ -1,0 +1,341 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Attendance System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-container {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin: 100px auto 20px;
+            position: relative;
+        }
+                
+        #logo {
+            text-align: center;
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .center-container {
+            position: relative;
+            z-index: 0;
+        }
+
+        #logo img {
+            width: 4.5cm;
+            height: 4.5cm;
+        }
+
+        #registration-form {
+            margin-top: 80px;
+        }
+
+        #registration-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #registration-form input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .button-container button {
+            flex: 0 1 auto;
+            position: relative;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            min-width: 120px;
+            height: 40px;
+        }
+
+        .button-container button:disabled {
+            opacity: 0.7;
+        }
+
+        .button-container button:disabled::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 40px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+    <script type="module">
+        
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let justRegistered = false;
+
+
+        document.getElementById('login').addEventListener('click', function() {
+            window.location.href = "login.html";
+        });
+
+        let isRegistering = false;
+        document.getElementById('register').addEventListener('click', async function() {
+            if (isRegistering) return;
+            isRegistering = true;
+            const registerBtn = document.getElementById('register');
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registering...';
+
+            const name = document.getElementById('name').value;
+            const semester = document.getElementById('semester').value;
+            const section = document.getElementById('section').value;
+            const rollNumber = document.getElementById('rollNumber').value;
+            const macAddress = document.getElementById('macAddress').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!name) {
+                showWarning("Name is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!semester) {
+                showWarning("Semester is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!section) {
+                showWarning("Section is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!rollNumber) {
+                showWarning("Roll Number is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!macAddress) {
+                showWarning("MAC Address is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!email) {
+                showWarning("Email is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+            if (!password) {
+                showWarning("Password is required.");
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                return;
+
+            }
+
+            const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$/;
+
+            if (!macRegex.test(macAddress)) {
+                showWarning("Invalid MAC address. Please enter in format: 01:23:45:67:89:AB or 01-23-45-67-89-AB");
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+                isRegistering = false;
+                return;
+
+            }
+
+            try {
+                const querySnapshot = await getDocs(query(collection(db, "students"), where("email", "==", email)));
+                if (!querySnapshot.empty) {
+                    showWarning("User is already registered. Please login instead.");
+                    return;
+
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                await addDoc(collection(db, "students"), {
+                    email: email,
+                    name: name,
+                    semester: semester,
+                    section: section,
+                    rollNumber: rollNumber,
+                    macAddress: macAddress,
+                    uid: user.uid
+                });
+
+                justRegistered = true;
+                showWarning("Registration successful. Please login with your credentials.");
+
+
+                document.getElementById('name').value = '';
+                document.getElementById('semester').value = '';
+                document.getElementById('section').value = '';
+                document.getElementById('rollNumber').value = '';
+                document.getElementById('macAddress').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            } catch (error) {
+                console.error("Error during registration: ", error);
+                showWarning("Registration failed. Please try again.");
+
+            } finally {
+                isRegistering = false;
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Register';
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="center-container">
+        <div id="logo">
+            <img src="images/logo.png" alt="Wifi Attendance Logo" />
+        </div>
+        
+        <div id="registration-form">
+            <h2>Student Registration</h2>
+            <input type="text" id="name" placeholder="Enter Name">
+            <input type="text" id="semester" placeholder="Enter Semester">
+            <input type="text" id="section" placeholder="Enter Section">
+            <input type="text" id="rollNumber" placeholder="Enter Roll Number">
+            <input type="text" id="macAddress" placeholder="Enter MAC Address">
+            <input type="email" id="email" placeholder="Enter Email">
+            <input type="password" id="password" placeholder="Enter Password">
+            <div class="button-container">
+                <button id="register">Register</button>
+                <button id="login">Login</button>
+            </div>
+        </div>
+    </div>
+    <!-- Custom Warning Modal -->
+    <div id="custom-warning" class="warning-modal">
+        <div class="warning-content">
+            <span class="warning-icon">⚠️</span>
+            <p id="warning-message"></p>
+            <button class="warning-close">OK</button>
+        </div>
+    </div>
+
+    <style>
+        .warning-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .warning-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .warning-icon {
+            font-size: 2em;
+            color: #ff9800;
+        }
+
+        .warning-close {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .warning-close:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        // Custom warning functions
+        function showWarning(message) {
+            const warning = document.getElementById('custom-warning');
+            document.getElementById('warning-message').textContent = message;
+            warning.style.display = 'block';
+        }
+
+        function hideWarning() {
+            document.getElementById('custom-warning').style.display = 'none';
+        }
+
+        // Setup event listeners
+        document.querySelector('.warning-close').addEventListener('click', hideWarning);
+    </script>
+</body>
+</html>
