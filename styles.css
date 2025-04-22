@@ -1,0 +1,55 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('https://img.freepik.com/free-vector/geometric-science-education-background-vector-gradient-blue-digital-remix_53876-125993.jpg'); /* Background image */
+    background-size: cover; /* Cover the entire page */
+    background-position: center; /* Center the image */
+    margin: 0;
+    padding: 20px;
+}
+
+
+.center-container {
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    height: auto; /* Set height to auto for flexibility */
+    margin: auto;
+}
+
+
+h1 {
+    color: #333;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Updated font family */
+}
+
+
+#registration-form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* Stack inputs vertically */
+    align-items: center; /* Center align inputs */
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 10px; /* Added spacing for vertical alignment */
+    margin-right: 0; /* Removed right margin */
+    width: 80%; /* Adjusted width for a more suitable length */
+    border-radius: 20px; /* Set border-radius for elliptical shape */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

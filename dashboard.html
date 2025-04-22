@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Wi-Fi Attendance System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script type="module">
+        
+    
+        // Listen for Auth State Change
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                fetchAttendanceRecords(user.email);  // Fetch attendance for logged-in user
+            } else {
+                window.location.href = "index.html"; // Redirect to login if not authenticated
+            }
+        });
+    
+        // Fetch Attendance Records Based on Email
+        const fetchAttendanceRecords = async (uid) => {
+    try {
+        const response = await axios.post("http://localhost:5501/get-attendance", {
+            email: auth.currentUser.email
+        });
+
+        console.log("Fetched Attendance Data:", response.data);  // ✅ Debugging line
+
+        const attendanceTableBody = document.getElementById("attendance-table-body");
+        attendanceTableBody.innerHTML = "";
+
+        if (response.data.history.length === 0) {
+            attendanceTableBody.innerHTML = "<tr><td colspan='2'>No attendance records found.</td></tr>";
+        } else {
+            response.data.history.forEach(record => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${record.date}</td><td>${record.status}</td>`;
+                attendanceTableBody.appendChild(row);
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching attendance:", error);
+    }
+};
+
+    
+        // Logout Functionality
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("logout").addEventListener("click", () => {
+                signOut(auth).then(() => {
+                    window.location.href = "index.html";
+                }).catch(error => {
+                    console.error("Logout error:", error);
+                });
+            });
+        });
+    </script>
+    
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-container {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin: 100px auto 20px;
+            position: relative;
+        }
+
+        #attendance-section {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        #attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #attendance-table th,
+        #attendance-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #attendance-table th {
+            background-color: inherit;
+            color: inherit;
+        }
+
+        h1 {
+            color: #000000;
+            text-align: center;
+            margin-top: 100px;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        h2 {
+            color: #000000;
+            text-align: center;
+            margin-top: 0px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #logo {
+            text-align: center;
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #logo img {
+            width: 4.5cm;
+            height: 4.5cm;
+        }
+
+        #logout {
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #logout:hover {
+            background-color: #c82333;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="center-container">
+        <div id="logo">
+            <img src="images/logo.png" alt="Wifi Attendance Logo" />
+        </div>
+
+        <h1>Welcome to the Dashboard</h1>
+
+        <div id="attendance-section">
+            <h2>Attendance Records</h2>
+            <table id="attendance-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="attendance-table-body">
+                    <!-- Attendance data will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="logout">Logout</button>
+        </div>  
+</body>
+</html>

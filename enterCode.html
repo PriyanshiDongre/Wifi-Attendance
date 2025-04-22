@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Temporary Code</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .center-container {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin: 100px auto 20px;
+            position: relative;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 120px;
+        }
+
+        #logo {
+            text-align: center;
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        #logo img {
+            width: 4.5cm;
+            height: 4.5cm;
+        }
+
+        #code-form {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        #code-form input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        #code-form button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            min-width: 120px;
+        }
+    </style>
+    <script type="module">
+       
+        let studentEmail = null;
+    
+        // Fetch logged-in user's email
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                studentEmail = user.email; // Store email globally
+            } else {
+                console.error("No user logged in.");
+            }
+        });
+    
+        document.getElementById('code-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+    
+            const enteredCode = document.getElementById('temporary-code').value;
+    
+            if (!enteredCode) {
+                showWarning("Code is required.");
+                return;
+            }
+    
+            if (!studentEmail) {
+                alert("User email not found. Please re-login.");
+                return;
+            }
+    
+            try {
+                const response = await fetch('/verify-attendance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: studentEmail, enteredCode }) // Only sending email & code
+                });
+    
+                const data = await response.json();
+    
+                if (data.success) {
+                    alert("✅ Attendance marked successfully!");
+                } else {
+                    alert("⚠️ " + data.message);
+                }
+            } catch (error) {
+                console.error("Error verifying attendance:", error);
+                showWarning("An error occurred. Please try again.");
+            }
+        });
+    
+        document.getElementById('dashboard-button').addEventListener('click', function() {
+            window.location.href = "dashboard.html";
+        });
+    
+        document.getElementById('logout').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Logout error:", error);
+            });
+        });
+    
+        function showWarning(message) {
+            alert("⚠️ " + message);
+        }
+    </script>
+    
+    
+</head>
+<body>
+    <div class="center-container">
+        <div id="logo">
+            <img src="images/logo.png" alt="Wifi Attendance Logo" />
+        </div>
+        
+        <div id="code-form">
+            <h1>Enter Temporary Code</h1>
+            <input type="text" id="temporary-code" placeholder="Temporary Code" required>
+            <button type="submit">Submit</button>
+            <button id="dashboard-button" style="display: inline; margin-top: 8px;">Go to Dashboard</button><br>
+            <button id="logout" style="display: inline; margin-top: 8px; background-color: red;">Logout</button>
+        </div>
+    </div>
+</body>
+</html>

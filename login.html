@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Wi-Fi Attendance System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+
+        .center-container {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin: 100px auto 20px;
+            position: relative;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 120px;
+        }
+        
+        #logo {
+            text-align: center;
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        #logo img {
+            width: 4.5cm;
+            height: 4.5cm;
+            margin-bottom: 20px;
+        }
+        
+        #login-form {
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+        }
+
+/* Center the elements inside .all */
+        .all {
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: center; /* Center horizontally */
+            justify-content: center; /* Center vertically */
+            gap: 15px; /* Space between elements */
+            padding: 30px;
+            border-radius: 10px; /* Rounded corners */
+        }
+
+/* Style inputs */
+        .all input {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+}
+
+/* Style button */
+        #login-button {
+            width: 50%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .all{
+        display: block; /* Make the input take full width */
+        margin: 10px auto; /* Center horizontally */
+        width: 90%; /* Adjust width */
+        max-width: 300px; /* Prevent it from getting too wide */
+        padding: 10px;
+        border-radius: 5px;
+        justify-content: space-evenly; /* Center the buttons */
+        display: flex;
+        flex-direction: column;
+        margin-left: auto;
+        margin-right: auto;
+        }
+        
+        #Option {
+            display: none; /* Hidden initially */
+            position: relative; /* Ensures proper positioning */
+            margin-top: 120px; /* Pushes the buttons down */
+            text-align: center; /* Aligns buttons to center */
+}
+        
+        #Option button {
+            display: block; /* Each button takes full width */
+            margin: 10px auto; /* Centers horizontally with spacing */
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #Option button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Styling the password container */
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Style for input field */
+.password-container input {
+    width: 80%;
+    padding: 10px;
+    padding-right: 40px; /* Space for the icon */
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin: 10px auto; /* Center horizontally */
+
+}
+
+/* Style for eye icon */
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+
+.toggle-password i {
+    font-size: 18px;
+    color: gray;
+}
+
+.toggle-password i:hover {
+    color: black;
+}
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+
+        #loading-spinner {
+            display: none;
+            color: #007bff;
+            margin-top: 10px;
+        }
+
+        
+
+        .warning-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .warning-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .warning-icon {
+            font-size: 2em;
+            color: #ff9800;
+        }
+
+        .warning-close {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .warning-close:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="center-container">
+        <div id="logo">
+            <img src="images/logo.png" alt="Wi-Fi Attendance Logo" />
+        </div>
+        
+        <form id="login-form">
+            <div class="all">
+            <h1>Login</h1>
+            <input type="email" id="email" placeholder="Enter Email" required>
+
+            <div class="password-container">
+                <input type="password" id="password" placeholder="Enter Password" required>
+                <span class="toggle-password">
+                    <i id="eye-icon" class="fas fa-eye"></i>
+                </span>
+            </div>      
+            
+            <button type="submit" id="login-button">Login</button>
+            <div id="loading-spinner">Loading...</div>
+            </div>
+        </form>
+
+        <div id="Option">
+            <button id="dashboard-button">Go to Dashboard</button>
+            <button id="enter-code-button">Enter Code</button>
+        </div>
+    </div>
+
+    <div id="custom-warning" class="warning-modal">
+        <div class="warning-content">
+            <span class="warning-icon">⚠️</span>
+            <p id="warning-message"></p>
+            <button class="warning-close">OK</button>
+        </div>
+    </div>
+
+    <script type="module">
+       
+        document.getElementById("eye-icon").addEventListener("click", function () {
+    let passwordField = document.getElementById("password");
+
+    if (passwordField.type === "password") {
+        passwordField.type = "text";  // Show password
+        this.classList.remove("fa-eye");
+        this.classList.add("fa-eye-slash");  // Change icon
+    } else {
+        passwordField.type = "password";  // Hide password
+        this.classList.remove("fa-eye-slash");
+        this.classList.add("fa-eye");  // Change icon back
+    }
+});
+
+        // Login Event Listener
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginButton = document.getElementById('login-button');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const optionSection = document.getElementById('Option');
+
+            if (!email || !password) {
+                showWarning("Email and password are required.");
+                return;
+            }
+
+            // Disable login button and show spinner
+            loginButton.disabled = true;
+            loadingSpinner.style.display = 'block';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+
+                // Hide login form and show options
+                document.getElementById('login-form').style.display = 'none';
+                optionSection.style.display = 'block';
+            } catch (error) {
+                console.error("Login error:", error);
+                showWarning("Invalid credentials. Please try again.");
+            } finally {
+                // Re-enable login button and hide spinner
+                loginButton.disabled = false;
+                loadingSpinner.style.display = 'none';
+            }
+        });
+
+        // Page Redirects
+        document.getElementById('dashboard-button').addEventListener('click', function() {
+            window.location.href = "dashboard.html";
+        });
+
+        document.getElementById('enter-code-button').addEventListener('click', function() {
+            window.location.href = "enterCode.html";
+        });
+
+        // Warning Modal Functions
+        function showWarning(message) {
+            document.getElementById('warning-message').textContent = message;
+            document.getElementById('custom-warning').style.display = 'block';
+        }
+
+        function hideWarning() {
+            document.getElementById('custom-warning').style.display = 'none';
+        }
+
+        document.querySelector('.warning-close').addEventListener('click', hideWarning);
+    </script>
+
+</body>
+</html>
