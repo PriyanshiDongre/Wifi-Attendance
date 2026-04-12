@@ -30,3 +30,5 @@ This project is a smart attendance system that detects students' presence using 
 
 ---
 
+## Link To the APP
+https://wifiattendance-393e7.web.app/
